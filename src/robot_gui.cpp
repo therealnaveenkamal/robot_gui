@@ -60,9 +60,12 @@ void CVUIROSCmdVelPublisher::robotInfoCallback(
 }
 
 void CVUIROSCmdVelPublisher::run() {
-  cv::Mat frame = cv::Mat(600, 400, CV_8UC3);
+  cv::Mat frame = cv::Mat(600, 350, CV_8UC3);
   std::string ros_distance = "0";
   ros::NodeHandle nh_gui;
+
+  twist_msg.linear.x = 0.0;
+  twist_msg.angular.z = 0.0;
 
   ros::NodeHandle nh_service;
   ros::ServiceClient distance_client =
@@ -88,32 +91,33 @@ void CVUIROSCmdVelPublisher::run() {
     frame = cv::Scalar(49, 52, 49);
 
     cvui::window(frame, 30, 5, 240, 180, "Info");
-    cvui::printf(frame, 34, 25, 0.4, 0xff0000, "%s",
+    cvui::printf(frame, 34, 25, 0.4, 0xffffff, "%s",
                  robot_info_msg_.data_field_01.c_str());
-    cvui::printf(frame, 34, 40, 0.4, 0xff0000, "%s",
+    cvui::printf(frame, 34, 40, 0.4, 0xffffff, "%s",
                  robot_info_msg_.data_field_02.c_str());
-    cvui::printf(frame, 34, 55, 0.4, 0xff0000, "%s",
+    cvui::printf(frame, 34, 55, 0.4, 0xffffff, "%s",
                  robot_info_msg_.data_field_03.c_str());
-    cvui::printf(frame, 34, 70, 0.4, 0xff0000, "%s",
+    cvui::printf(frame, 34, 70, 0.4, 0xffffff, "%s",
                  robot_info_msg_.data_field_04.c_str());
 
-    cvui::printf(frame, 34, 85, 0.4, 0xff0000, "%s",
+    cvui::printf(frame, 34, 85, 0.4, 0xffffff, "%s",
                  robot_info_msg_.data_field_05.c_str());
 
-    cvui::printf(frame, 34, 100, 0.4, 0xff0000, "%s",
+    cvui::printf(frame, 34, 100, 0.4, 0xffffff, "%s",
                  robot_info_msg_.data_field_06.c_str());
 
-    cvui::printf(frame, 34, 115, 0.4, 0xff0000, "%s",
+    cvui::printf(frame, 34, 115, 0.4, 0xffffff, "%s",
                  robot_info_msg_.data_field_07.c_str());
 
-    cvui::printf(frame, 34, 130, 0.4, 0xff0000, "%s",
+    cvui::printf(frame, 34, 130, 0.4, 0xffffff, "%s",
                  robot_info_msg_.data_field_08.c_str());
 
-    cvui::printf(frame, 34, 145, 0.4, 0xff0000, "%s",
+    cvui::printf(frame, 34, 145, 0.4, 0xffffff, "%s",
                  robot_info_msg_.data_field_09.c_str());
-    cvui::printf(frame, 34, 160, 0.4, 0xff0000, "%s",
+    cvui::printf(frame, 34, 160, 0.4, 0xffffff, "%s",
                  robot_info_msg_.data_field_10.c_str());
 
+    twist_pub_.publish(twist_msg);
     if (cvui::button(frame, 100, 200, " Forward ")) {
       twist_msg.linear.x = twist_msg.linear.x + linear_velocity_step;
       twist_pub_.publish(twist_msg);
@@ -147,21 +151,21 @@ void CVUIROSCmdVelPublisher::run() {
 
     cvui::text(frame, 30, 340, "Estimated robot position based off odometry");
 
-    cvui::window(frame, 30, 360, 100, 100, "X");
-    cvui::printf(frame, 80, 390, 0.4, 0xff0000, "%.2f",
+    cvui::window(frame, 30, 360, 80, 80, "X");
+    cvui::printf(frame, 50, 390, 0.5, 0xffffff, "%.2f",
                  data.pose.pose.position.x);
 
-    cvui::window(frame, 140, 360, 100, 100, "Y");
-    cvui::printf(frame, 190, 390, 0.4, 0xff0000, "%.2f",
+    cvui::window(frame, 120, 360, 80, 80, "Y");
+    cvui::printf(frame, 150, 390, 0.5, 0xffffff, "%.2f",
                  data.pose.pose.position.y);
 
-    cvui::window(frame, 250, 360, 100, 100, "Z");
-    cvui::printf(frame, 300, 390, 0.4, 0xff0000, "%.2f",
+    cvui::window(frame, 210, 360, 80, 80, "Z");
+    cvui::printf(frame, 240, 390, 0.5, 0xffffff, "%.2f",
                  data.pose.pose.position.z);
 
     cvui::text(frame, 30, 480, "Distance Travelled");
-    cvui::window(frame, 100, 500, 240, 50, "Distance in meters");
-    cvui::printf(frame, 310, 530, 0.4, 0xff0000, "%.2f",
+    cvui::window(frame, 100, 500, 200, 50, "Distance in meters");
+    cvui::printf(frame, 250, 525, 0.5, 0xffffff, "%.2f",
                  std::stof(ros_distance));
 
     if (cvui::button(frame, 30, 500, " Call ")) {
